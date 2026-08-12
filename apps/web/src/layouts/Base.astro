@@ -18,11 +18,10 @@ const repo = "https://github.com/leomosley/pigeon";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#10151b" />
+    <meta name="theme-color" content="#0a0a0b" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
-
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pigeon" />
     <meta property="og:title" content={title} />
@@ -31,44 +30,46 @@ const repo = "https://github.com/leomosley/pigeon";
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta
-      property="og:image:alt"
-      content="Pigeon carries an artifact from a terminal to a browser"
-    />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body>
-    <header
-      class="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-night/80 backdrop-blur-xl"
-    >
-      <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-8">
-        <a href="/" class="flex items-center gap-2 font-mono text-xs tracking-[0.16em] text-paper">
-          <span class="text-coral">●</span> PIGEON
-        </a>
-        <nav class="flex items-center gap-5 text-xs text-mist/60" aria-label="Primary navigation">
-          <a
-            class:list={["transition hover:text-paper", active === "docs" && "text-paper"]}
-            href="/docs">Docs</a
-          >
-          <a class="transition hover:text-paper" href={repo}>GitHub</a>
-        </nav>
-      </div>
+  <body class="min-h-screen text-neutral-300 antialiased">
+    <header class="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 py-4 sm:px-8">
+      <a
+        href="/"
+        class="font-mono text-sm tracking-tight text-neutral-200 transition-opacity hover:opacity-70"
+      >
+        pigeon
+      </a>
+      <nav class="flex items-center gap-5 text-sm" aria-label="Primary navigation">
+        <a
+          class:list={[
+            "transition-colors hover:text-neutral-200",
+            active === "docs" ? "text-neutral-200" : "text-neutral-500",
+          ]}
+          href="/docs">Docs</a
+        >
+        <a
+          class="rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-1.5 text-xs text-neutral-400 transition hover:border-white/[0.15] hover:text-neutral-200"
+          href={repo}>GitHub</a
+        >
+      </nav>
     </header>
-    <main><slot /></main>
-    <footer class="border-t border-white/[0.06] px-5 py-8 text-xs text-mist/40 sm:px-8">
-      <div class="mx-auto flex max-w-5xl items-center justify-between">
-        <span class="font-mono">pigeon / route complete</span>
-        <a class="transition hover:text-mist" href="https://mosley.dev">mosley.dev</a>
+    <main class="relative z-10"><slot /></main>
+    <footer
+      class="relative z-10 border-t border-white/[0.06] px-5 py-8 text-xs text-neutral-600 sm:px-8"
+    >
+      <div class="mx-auto flex max-w-3xl items-center justify-between">
+        <span class="font-mono">pigeon</span>
+        <a class="transition-colors hover:text-neutral-400" href="https://mosley.dev">mosley.dev</a>
       </div>
     </footer>
   </body>

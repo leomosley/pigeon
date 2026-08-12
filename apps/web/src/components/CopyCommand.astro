@@ -5,14 +5,12 @@ const { command } = Astro.props;
 <button
   type="button"
   data-copy={command}
-  class="group flex w-full items-center justify-between gap-5 rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-left font-mono text-xs text-mist transition hover:border-sky/40 hover:bg-white/[0.07] sm:w-auto"
+  class="group inline-flex cursor-pointer items-center rounded-full border border-white/10 bg-white/[0.03] font-mono text-sm tracking-tight text-neutral-200 transition-colors hover:border-white/[0.16]"
   aria-label={`Copy ${command}`}
 >
-  <span><span class="mr-2 text-sky">$</span>{command}</span>
-  <span
-    class="text-[10px] uppercase tracking-[0.18em] text-white/35 group-hover:text-sky"
-    data-label>Copy</span
-  >
+  <span class="py-2.5 pl-5 pr-3"><span class="mr-1.5 text-neutral-600">$</span>{command}</span>
+  <span class="h-4 w-px bg-white/10"></span>
+  <span class="px-3 py-2.5 text-xs text-neutral-500 group-hover:text-sky" data-label>Copy</span>
 </button>
 
 <script>
@@ -22,7 +20,7 @@ const { command } = Astro.props;
       const label = button.querySelector<HTMLElement>("[data-label]");
       if (!label) return;
       label.textContent = "Copied";
-      window.setTimeout(() => (label.textContent = "Copy"), 1600);
+      window.setTimeout(() => (label.textContent = "Copy"), 1400);
     });
   });
 </script>

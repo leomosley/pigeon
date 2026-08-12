@@ -1,102 +1,68 @@
 ---
 import CopyCommand from "../components/CopyCommand.astro";
 import Base from "../layouts/Base.astro";
-
-const description = "Install and configure Pigeon for your coding agents.";
 ---
 
-<Base title="Pigeon docs — set up an artifact route" description={description} active="docs">
-  <div class="mx-auto max-w-5xl px-5 pb-28 pt-36 sm:px-8 sm:pt-44">
-    <div class="max-w-2xl">
-      <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sky">Field manual</p>
-      <h1 class="mt-5 font-display text-5xl leading-none sm:text-7xl">Set the route once.</h1>
-      <p class="mt-6 text-sm leading-7 text-mist/55">
-        Pigeon creates the bucket, installs the agent skill, and keeps credentials in one local
-        file.
-      </p>
-    </div>
+<Base
+  title="Pigeon docs"
+  description="Install and configure Pigeon for your coding agents."
+  active="docs"
+>
+  <article class="mx-auto max-w-3xl px-5 pb-28 pt-36 sm:pt-44">
+    <h1 class="text-4xl font-light tracking-tight text-white sm:text-5xl">Set up Pigeon</h1>
+    <p class="mt-5 max-w-xl text-sm leading-relaxed text-neutral-500">
+      Pigeon creates a Cloudflare R2 bucket, configures upload access, and installs a shared agent
+      skill.
+    </p>
 
-    <div class="mt-20 grid gap-12 lg:grid-cols-[180px_1fr]">
-      <aside class="font-mono text-[10px] uppercase tracking-widest text-mist/35">
-        <p>Setup / 5 minutes</p><p class="mt-3">Default expiry / 90 days</p><p class="mt-3">
-          Config / ~/.pigeon
+    <div class="mt-14 space-y-14">
+      <section>
+        <h2 class="text-base font-medium text-neutral-200">1. Create Cloudflare tokens</h2>
+        <p class="mt-3 max-w-2xl text-sm leading-7 text-neutral-500">
+          Set <code class="text-neutral-300">CLOUDFLARE_API_TOKEN</code> to a token with Workers R2 Storage
+          Write. Set <code class="text-neutral-300">CLOUDFLARE_TOKEN_TOKEN</code> to a token made from
+          Cloudflare's Create additional tokens template. Bootstrap tokens are never stored.
         </p>
-      </aside>
-      <div class="max-w-2xl space-y-16">
-        <section>
-          <p class="font-mono text-xs text-coral">01</p><h2 class="mt-3 text-xl font-medium">
-            Prepare Cloudflare
-          </h2>
-          <p class="mt-4 text-sm leading-7 text-mist/55">
-            Create a bootstrap API token with <strong class="text-mist"
-              >Workers R2 Storage Write</strong
-            >. For automatic scoped-key creation, also provide a token made from Cloudflare’s <strong
-              class="text-mist">Create additional tokens</strong
-            > template.
-          </p>
-          <p class="mt-3 text-sm leading-7 text-mist/55">
-            For strict separation, pass them independently as <code class="text-sky"
-              >--r2-token</code
-            > and <code class="text-sky">--token-token</code>. Bootstrap tokens are never stored.
-          </p>
-        </section>
-        <section>
-          <p class="font-mono text-xs text-coral">02</p><h2 class="mt-3 text-xl font-medium">
-            Run setup
-          </h2>
-          <div class="mt-5">
-            <CopyCommand command="npx @leomosley/pigeon init --account YOUR_ACCOUNT_ID" />
-          </div>
-          <p class="mt-4 text-sm leading-7 text-mist/55">
-            Set <code class="text-sky">CLOUDFLARE_API_TOKEN</code> for bucket management and
-            <code class="text-sky">CLOUDFLARE_TOKEN_TOKEN</code> for scoped-key creation. Prefer environment
-            variables over shell history.
-          </p>
-        </section>
-        <section>
-          <p class="font-mono text-xs text-coral">03</p><h2 class="mt-3 text-xl font-medium">
-            Use pre-made credentials
-          </h2>
-          <p class="mt-4 text-sm leading-7 text-mist/55">
-            Avoid API Tokens Write entirely by creating bucket-scoped R2 credentials in Cloudflare
-            first.
-          </p>
-          <div class="mt-5">
-            <CopyCommand
-              command="npx @leomosley/pigeon init --account YOUR_ACCOUNT_ID --with-key"
-            />
-          </div>
-        </section>
-        <section>
-          <p class="font-mono text-xs text-coral">04</p><h2 class="mt-3 text-xl font-medium">
-            Check the route
-          </h2>
-          <div class="mt-5"><CopyCommand command="npx @leomosley/pigeon doctor" /></div>
-          <p class="mt-4 text-sm leading-7 text-mist/55">
-            Doctor uploads a tiny probe, reads it over the public route, then deletes it.
-          </p>
-        </section>
-        <section class="rounded-xl border border-white/[0.08] bg-white/[0.03] p-6">
-          <h2 class="text-lg font-medium">Agent prerequisites</h2>
-          <p class="mt-3 text-sm leading-7 text-mist/55">
-            Agents use <code class="text-sky">aws-cli</code> for upload. Screenshot capture uses native
-            tools or headless Chromium. Pigeon installs the shared skill at <code class="text-sky"
-              >~/.agents/skills/pigeon</code
-            > and links Claude’s global skill directory when safe.
-          </p>
-        </section>
-        <section>
-          <h2 class="text-xl font-medium">Lifecycle commands</h2>
-          <div class="mt-5 grid gap-3 font-mono text-xs text-mist/60">
-            <code>pigeon env --shell sh</code><code>pigeon rotate</code><code>pigeon destroy</code>
-          </div>
-          <p class="mt-4 text-sm leading-7 text-mist/55">
-            <code class="text-sky">rotate</code> works for Pigeon-managed keys. <code
-              class="text-sky">destroy</code
-            > empties and deletes the bucket before removing local config.
-          </p>
-        </section>
-      </div>
+      </section>
+
+      <section>
+        <h2 class="text-base font-medium text-neutral-200">2. Run setup</h2>
+        <div class="mt-4">
+          <CopyCommand command="npx p1geon init --account YOUR_ACCOUNT_ID" />
+        </div>
+        <p class="mt-3 text-sm leading-7 text-neutral-500">
+          To supply pre-made bucket credentials instead, add <code class="text-neutral-300"
+            >--with-key</code
+          >.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-medium text-neutral-200">3. Check it works</h2>
+        <div class="mt-4"><CopyCommand command="npx p1geon doctor" /></div>
+        <p class="mt-3 text-sm leading-7 text-neutral-500">
+          Doctor uploads a small file, opens it through the public route, then deletes it.
+        </p>
+      </section>
+
+      <section class="border-t border-white/[0.06] pt-10">
+        <h2 class="text-base font-medium text-neutral-200">Requirements</h2>
+        <p class="mt-3 text-sm leading-7 text-neutral-500">
+          Agents use <code class="text-neutral-300">aws-cli</code> to upload files. Screenshot capture
+          uses native tools or headless Chromium. Config lives at <code class="text-neutral-300"
+            >~/.pigeon/config</code
+          >.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-base font-medium text-neutral-200">Manage it</h2>
+        <div class="mt-4 space-y-2 font-mono text-sm text-neutral-400">
+          <p>pigeon env --shell sh</p>
+          <p>pigeon rotate</p>
+          <p>pigeon destroy</p>
+        </div>
+      </section>
     </div>
-  </div>
+  </article>
 </Base>

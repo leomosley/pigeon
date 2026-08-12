@@ -7,7 +7,7 @@
   <text x="88" y="407" fill="#88979e" font-family="sans-serif" font-size="24">Artifacts from remote machines, delivered.</text>
   <rect x="86" y="488" width="438" height="58" rx="10" fill="#ffffff" fill-opacity=".04" stroke="#ffffff" stroke-opacity=".1"/>
   <text x="108" y="525" fill="#8cc8e8" font-family="monospace" font-size="18">$</text>
-  <text x="136" y="525" fill="#c8d4d9" font-family="monospace" font-size="18">npx @leomosley/pigeon init</text>
+  <text x="136" y="525" fill="#c8d4d9" font-family="monospace" font-size="18">npx p1geon init</text>
   <path d="M735 465 C 820 135, 1010 450, 1110 130" fill="none" stroke="#8cc8e8" stroke-opacity=".55" stroke-width="2" stroke-dasharray="8 12"/>
   <circle cx="735" cy="465" r="8" fill="#f17a64"/>
   <circle cx="1110" cy="130" r="8" fill="#8cc8e8"/>

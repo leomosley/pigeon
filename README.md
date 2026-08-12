@@ -10,7 +10,7 @@ an Agent Skill. It is a bootstrapper, not a background service.
 ## Install
 
 ```sh
-npx @leomosley/pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
+npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
 ```
 
 Set `CLOUDFLARE_API_TOKEN` to a bootstrap token with Workers R2 Storage Write.
@@ -21,7 +21,7 @@ never stored.
 To avoid API Tokens Write, create bucket-scoped R2 S3 credentials first:
 
 ```sh
-npx @leomosley/pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
+npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
 ```
 
 Agents need `aws-cli` to upload artifacts. See [pigeon.mosley.dev](https://pigeon.mosley.dev)
@@ -61,7 +61,7 @@ Workspace layout:
 
 Add `NPM_TOKEN` to GitHub Actions secrets. Conventional commits merged to
 `main` are versioned by git-cliff; the release workflow publishes
-`@leomosley/pigeon` and creates a GitHub release.
+`p1geon` and creates a GitHub release.
 
 ### Vercel
 

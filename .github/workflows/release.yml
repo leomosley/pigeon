@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           version=$(git cliff --bumped-version 2>/dev/null | sed 's/^v//')
-          latest=$(npm view @leomosley/pigeon version 2>/dev/null || printf '0.0.0')
+          latest=$(npm view p1geon version 2>/dev/null || printf '0.0.0')
           if [ -n "$version" ] && [ "$version" != "$latest" ]; then
             echo "value=$version" >> "$GITHUB_OUTPUT"
             echo "publish=true" >> "$GITHUB_OUTPUT"
