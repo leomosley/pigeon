@@ -1,0 +1,12 @@
+node_modules/
+dist/
+release-dist/
+.astro/
+.turbo/
+coverage/
+.env
+.env.*
+!.env.example
+.DS_Store
+.vercel/
+*.log
