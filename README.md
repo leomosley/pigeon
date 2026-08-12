@@ -66,7 +66,7 @@ Add `NPM_TOKEN` to GitHub Actions secrets. Conventional commits merged to
 ### Vercel
 
 1. Import `github.com/leomosley/pigeon` into Vercel.
-2. Keep repository root as project root; `vercel.json` supplies build settings.
+2. Set Root Directory to `apps/web`; its `vercel.json` supplies build settings.
 3. Add `pigeon.mosley.dev` under Project → Domains.
 4. Point the prompted DNS record to Vercel.
 
