@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.22
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+      - run: bun install --frozen-lockfile
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          version=$(git cliff --bumped-version 2>/dev/null | sed 's/^v//')
+          latest=$(npm view @leomosley/pigeon version 2>/dev/null || printf '0.0.0')
+          if [ -n "$version" ] && [ "$version" != "$latest" ]; then
+            echo "value=$version" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Verify
+        if: steps.version.outputs.publish == 'true'
+        run: bun run typecheck && bun run lint && bun run test
+      - name: Set package version
+        if: steps.version.outputs.publish == 'true'
+        run: npm version "${{ steps.version.outputs.value }}" --no-git-tag-version
+        working-directory: packages/cli
+      - name: Build package
+        if: steps.version.outputs.publish == 'true'
+        run: bun run build
+        working-directory: packages/cli
+      - name: Build standalone binaries
+        if: steps.version.outputs.publish == 'true'
+        working-directory: packages/cli
+        run: |
+          mkdir -p ../../release-dist
+          bun build src/index.ts --compile --minify --target=bun-linux-x64 --outfile ../../release-dist/pigeon-linux-x64
+          bun build src/index.ts --compile --minify --target=bun-linux-arm64 --outfile ../../release-dist/pigeon-linux-arm64
+          bun build src/index.ts --compile --minify --target=bun-darwin-x64 --outfile ../../release-dist/pigeon-darwin-x64
+          bun build src/index.ts --compile --minify --target=bun-darwin-arm64 --outfile ../../release-dist/pigeon-darwin-arm64
+          bun build src/index.ts --compile --minify --target=bun-windows-x64 --outfile ../../release-dist/pigeon-windows-x64.exe
+      - name: Publish package
+        if: steps.version.outputs.publish == 'true'
+        run: npm publish --access public --provenance
+        working-directory: packages/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Generate release notes
+        if: steps.version.outputs.publish == 'true'
+        run: git cliff --unreleased --bump --output RELEASE_NOTES.md
+      - name: Create GitHub release
+        if: steps.version.outputs.publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.value }}
+          name: v${{ steps.version.outputs.value }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            release-dist/*
