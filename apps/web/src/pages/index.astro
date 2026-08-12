@@ -1,0 +1,140 @@
+---
+import CopyCommand from "../components/CopyCommand.astro";
+import Base from "../layouts/Base.astro";
+
+const description =
+  "Give coding agents a safe route for sharing screenshots and artifacts from any machine.";
+---
+
+<Base title="Pigeon — artifacts from agents, delivered" description={description}>
+  <section
+    class="relative mx-auto min-h-[760px] max-w-5xl overflow-hidden px-5 pb-24 pt-36 sm:px-8 sm:pt-44"
+  >
+    <div class="reveal relative z-10 max-w-2xl">
+      <p class="mb-6 font-mono text-[11px] uppercase tracking-[0.2em] text-sky">
+        Remote agent courier
+      </p>
+      <h1 class="font-display text-6xl leading-[0.95] tracking-[-0.03em] text-paper sm:text-8xl">
+        Your agent saw it.<br /><em class="font-normal text-sky">Now you can too.</em>
+      </h1>
+      <p class="mt-7 max-w-lg text-sm leading-7 text-mist/60 sm:text-base">
+        Pigeon gives coding agents one safe route to send screenshots, reports, and build artifacts
+        from remote or headless machines.
+      </p>
+      <div class="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <CopyCommand command="npx @leomosley/pigeon init" />
+        <a class="text-sm text-mist/55 transition hover:text-sky" href="/docs">Read setup guide →</a
+        >
+      </div>
+    </div>
+
+    <div class="relative mt-20 h-64 sm:mt-8 sm:ml-auto sm:h-72 sm:w-[62%]" aria-hidden="true">
+      <svg
+        class="absolute inset-0 h-full w-full overflow-visible"
+        viewBox="0 0 620 280"
+        fill="none"
+      >
+        <path
+          class="route-line"
+          d="M72 200C175 42 354 252 543 72"
+          stroke="#8cc8e8"
+          stroke-opacity=".55"
+          stroke-width="1.5"></path>
+        <circle cx="72" cy="200" r="5" fill="#f17a64"></circle>
+        <circle cx="543" cy="72" r="5" fill="#8cc8e8"></circle>
+      </svg>
+      <div
+        class="absolute bottom-5 left-0 rounded-xl border border-white/10 bg-[#121920] p-4 shadow-2xl"
+      >
+        <p class="font-mono text-[10px] uppercase tracking-widest text-mist/35">
+          agent / headless-04
+        </p>
+        <p class="mt-3 font-mono text-xs text-mist">
+          <span class="text-sky">$</span> share screenshot.png
+        </p>
+      </div>
+      <div
+        class="absolute right-0 top-0 w-48 rounded-xl border border-sky/20 bg-[#17212a] p-3 shadow-2xl sm:w-56"
+      >
+        <div class="mb-3 flex gap-1.5">
+          <i class="h-1.5 w-1.5 rounded-full bg-coral"></i><i
+            class="h-1.5 w-1.5 rounded-full bg-mist/20"></i>
+        </div>
+        <div class="aspect-[4/3] rounded-md bg-[linear-gradient(145deg,#243747,#16222c)] p-3">
+          <div class="h-1.5 w-2/3 rounded bg-sky/25"></div>
+          <div class="mt-2 h-1.5 w-1/2 rounded bg-white/10"></div>
+          <div class="mt-7 h-12 rounded border border-white/5 bg-black/20"></div>
+        </div>
+        <p class="mt-2 font-mono text-[9px] text-sky/70">200 / delivered</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-white/[0.06]">
+    <div
+      class="mx-auto grid max-w-5xl divide-y divide-white/[0.06] px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:px-8"
+    >
+      <article class="py-8 sm:pr-8">
+        <p class="font-mono text-[10px] uppercase tracking-widest text-coral">01 / Set route</p>
+        <h2 class="mt-4 text-sm font-medium">One guided setup</h2>
+        <p class="mt-2 text-sm leading-6 text-mist/45">
+          Creates an R2 bucket, scoped credentials, expiry, and agent skill.
+        </p>
+      </article>
+      <article class="py-8 sm:px-8">
+        <p class="font-mono text-[10px] uppercase tracking-widest text-coral">02 / Hand off</p>
+        <h2 class="mt-4 text-sm font-medium">Works where agents work</h2>
+        <p class="mt-2 text-sm leading-6 text-mist/45">
+          macOS, Windows, Linux, or a display-less server. No resident process.
+        </p>
+      </article>
+      <article class="py-8 sm:pl-8">
+        <p class="font-mono text-[10px] uppercase tracking-widest text-coral">03 / Clear trail</p>
+        <h2 class="mt-4 text-sm font-medium">Artifacts expire</h2>
+        <p class="mt-2 text-sm leading-6 text-mist/45">
+          UUID routes and a 90-day lifecycle by default. Destroy removes everything.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-5 py-28 sm:px-8">
+    <div class="grid gap-14 sm:grid-cols-[0.8fr_1.2fr]">
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sky">
+          Designed for narrow access
+        </p>
+        <h2 class="mt-5 font-display text-4xl leading-tight sm:text-5xl">
+          A courier, not a warehouse.
+        </h2>
+      </div>
+      <div
+        class="grid gap-px overflow-hidden rounded-xl border border-white/[0.07] bg-white/[0.07]"
+      >
+        <div class="bg-night p-6">
+          <span class="font-mono text-xs text-sky">scoped object access</span><p
+            class="mt-2 text-sm leading-6 text-mist/50"
+          >
+            Agents can read, list, write, and delete objects in one bucket, never administer your
+            Cloudflare account.
+          </p>
+        </div>
+        <div class="bg-night p-6">
+          <span class="font-mono text-xs text-sky">public read</span><p
+            class="mt-2 text-sm leading-6 text-mist/50"
+          >
+            Each UUID path opens directly in your browser. Bucket listings remain unavailable.
+          </p>
+        </div>
+        <div class="bg-night p-6">
+          <span class="font-mono text-xs text-sky">clean exit</span><p
+            class="mt-2 text-sm leading-6 text-mist/50"
+          >
+            <code>pigeon destroy</code> empties the bucket, revokes managed keys, and removes installed
+            skills.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

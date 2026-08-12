@@ -1,0 +1,25 @@
+{
+  "name": "@leomosley/pigeon-web",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "lint": "prettier --check src public astro.config.mjs",
+    "clean": "rm -rf dist .astro",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@tailwindcss/vite": "^4.1.12",
+    "astro": "^7.2.1",
+    "tailwindcss": "^4.1.12",
+    "typescript": "^5.9.2"
+  }
+}

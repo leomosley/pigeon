@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-night: #10151b;
+  --color-paper: #f4f7f8;
+  --color-mist: #c8d4d9;
+  --color-sky: #8cc8e8;
+  --color-coral: #f17a64;
+}
+
+:root {
+  color-scheme: dark;
+  background: var(--color-night);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(140, 200, 232, 0.13), transparent 34rem),
+    var(--color-night);
+  color: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(140, 200, 232, 0.3);
+  color: white;
+}
+
+a,
+button {
+  outline-offset: 4px;
+}
+
+.route-line {
+  stroke-dasharray: 8 12;
+  animation: route 28s linear infinite;
+}
+
+.reveal {
+  animation: reveal 700ms ease-out both;
+}
+
+@keyframes route {
+  to {
+    stroke-dashoffset: -400;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .route-line,
+  .reveal {
+    animation: none;
+  }
+}

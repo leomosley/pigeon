@@ -1,0 +1,28 @@
+---
+const { command } = Astro.props;
+---
+
+<button
+  type="button"
+  data-copy={command}
+  class="group flex w-full items-center justify-between gap-5 rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-left font-mono text-xs text-mist transition hover:border-sky/40 hover:bg-white/[0.07] sm:w-auto"
+  aria-label={`Copy ${command}`}
+>
+  <span><span class="mr-2 text-sky">$</span>{command}</span>
+  <span
+    class="text-[10px] uppercase tracking-[0.18em] text-white/35 group-hover:text-sky"
+    data-label>Copy</span
+  >
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(button.dataset.copy ?? "");
+      const label = button.querySelector<HTMLElement>("[data-label]");
+      if (!label) return;
+      label.textContent = "Copied";
+      window.setTimeout(() => (label.textContent = "Copy"), 1600);
+    });
+  });
+</script>
