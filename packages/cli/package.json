@@ -1,0 +1,46 @@
+{
+  "name": "@leomosley/pigeon",
+  "version": "0.1.0",
+  "description": "Give coding agents a safe route for sharing artifacts from any machine.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leomosley/pigeon.git"
+  },
+  "homepage": "https://pigeon.mosley.dev",
+  "bin": {
+    "pigeon": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node --format esm --minify",
+    "compile": "bun build src/index.ts --compile --outfile dist/pigeon",
+    "dev": "bun run src/index.ts",
+    "lint": "prettier --check src test",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@clack/prompts": "^0.11.0",
+    "commander": "^14.0.0",
+    "smol-toml": "^1.4.2",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.21",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
