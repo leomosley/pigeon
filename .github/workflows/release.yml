@@ -50,7 +50,7 @@ jobs:
         run: bun run typecheck && bun run lint && bun run test
       - name: Set package version
         if: steps.version.outputs.publish == 'true'
-        run: npm version "${{ steps.version.outputs.value }}" --no-git-tag-version
+        run: npm pkg set version="${{ steps.version.outputs.value }}"
         working-directory: packages/cli
       - name: Build package
         if: steps.version.outputs.publish == 'true'
