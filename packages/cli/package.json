@@ -6,11 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/leomosley/pigeon.git"
+    "url": "git+https://github.com/leomosley/pigeon.git"
   },
   "homepage": "https://pigeon.mosley.dev",
   "bin": {
-    "pigeon": "./dist/index.js"
+    "pigeon": "dist/index.js"
   },
   "files": [
     "dist",
