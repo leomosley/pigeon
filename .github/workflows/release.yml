@@ -77,7 +77,7 @@ jobs:
         run: git cliff --unreleased --bump --output RELEASE_NOTES.md
       - name: Create GitHub release
         if: steps.version.outputs.publish == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.value }}
           name: v${{ steps.version.outputs.value }}
