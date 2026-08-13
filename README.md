@@ -10,7 +10,7 @@ an Agent Skill. It is a bootstrapper, not a background service.
 ## Install
 
 ```sh
-npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
+npm exec --yes --package=p1geon@latest -- pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
 ```
 
 Set `CLOUDFLARE_API_TOKEN` to a bootstrap token with Workers R2 Storage Write.
@@ -21,7 +21,7 @@ never stored.
 To avoid API Tokens Write, create bucket-scoped R2 S3 credentials first:
 
 ```sh
-npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
+npm exec --yes --package=p1geon@latest -- pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
 ```
 
 Agents need `aws-cli` to upload artifacts. See [pigeon.mosley.dev](https://pigeon.mosley.dev)
