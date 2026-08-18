@@ -14,6 +14,14 @@ const requireValue = <T>(value: T | symbol): T => {
   return value;
 };
 
+const resolveText = async (preferred: string | undefined, message: string): Promise<string> =>
+  preferred ||
+  requireValue(await p.text({ message, validate: (v) => (!v ? "Required" : undefined) }));
+
+const resolveSecret = async (preferred: string | undefined, message: string): Promise<string> =>
+  preferred ||
+  requireValue(await p.password({ message, validate: (v) => (!v ? "Required" : undefined) }));
+
 const credentials = async (options: {
   accessKeyId?: string;
   secretAccessKey?: string;
@@ -40,8 +48,8 @@ export const init = async (options: {
   withKey?: boolean;
   accessKeyId?: string;
   secretAccessKey?: string;
-  r2Token?: string;
-  tokenToken?: string;
+  token?: string;
+  dryRun?: boolean;
 }): Promise<void> => {
   p.intro("pigeon init");
   const home = homedir();
@@ -54,57 +62,63 @@ export const init = async (options: {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
 
-  const accountId =
-    options.account ??
-    requireValue(
-      await p.text({
-        message: "Cloudflare account ID",
-        validate: (v) => (!v ? "Required" : undefined),
-      })
-    );
+  const accountId = await resolveText(
+    options.account || process.env.ACCOUNT_ID,
+    "Cloudflare account ID"
+  );
   const bucket = options.bucket ?? `pigeon-${crypto.randomUUID()}`;
-  const sharedToken = process.env.CLOUDFLARE_API_TOKEN;
-  const r2Token = options.r2Token ?? sharedToken;
-  if (!r2Token) throw new Error("Set CLOUDFLARE_API_TOKEN or pass --r2-token");
-  const r2 = new CloudflareClient(r2Token);
-  const tokenToken = options.tokenToken ?? process.env.CLOUDFLARE_TOKEN_TOKEN;
-  const tokenClient = tokenToken
-    ? new CloudflareClient(tokenToken)
-    : sharedToken
-      ? new CloudflareClient(sharedToken)
-      : undefined;
+  const token = await resolveSecret(
+    options.token || process.env.CLOUDFLARE_API_TOKEN,
+    "Cloudflare API token (R2 Edit + API Tokens Write)"
+  );
+  const cf = new CloudflareClient(token);
+
+  if (options.dryRun) {
+    const spinner = p.spinner();
+    spinner.start("Validating Cloudflare token and account");
+    await cf.verifyAccess(accountId);
+    spinner.stop("Token and account verified");
+    p.note(
+      [
+        `Create R2 bucket: ${bucket}`,
+        "Enable public r2.dev domain",
+        `Set ${options.retentionDays}-day expiry lifecycle`,
+        options.withKey
+          ? "Prompt for supplied R2 S3 credentials"
+          : "Mint bucket-scoped write-only key",
+        "Self-test upload, install skill, write ~/.pigeon/config",
+      ].join("\n"),
+      "Plan (dry run — nothing was changed)"
+    );
+    p.outro("Dry run complete.");
+    return;
+  }
+
   let bucketCreated = false;
   let tokenId: string | undefined;
 
   const spinner = p.spinner();
   try {
     spinner.start("Creating R2 bucket");
-    await r2.createBucket(accountId, bucket);
+    await cf.createBucket(accountId, bucket);
     bucketCreated = true;
-    const publicBaseUrl = await r2.enablePublicDomain(accountId, bucket);
-    await r2.setRetention(accountId, bucket, options.retentionDays);
+    const publicBaseUrl = await cf.enablePublicDomain(accountId, bucket);
+    await cf.setRetention(accountId, bucket, options.retentionDays);
     if (options.withKey && !options.accessKeyId && !options.secretAccessKey) {
       spinner.stop(`Bucket ${bucket} is ready`);
       p.note(
         `Create an Object Read & Write R2 token scoped to ${bucket}, then enter its S3 credentials.`,
         "Cloudflare dashboard"
       );
-      options.accessKeyId = requireValue(
-        await p.text({
-          message: "R2 access key ID",
-          validate: (v) => (!v ? "Required" : undefined),
-        })
-      );
-      options.secretAccessKey = requireValue(
-        await p.password({
-          message: "R2 secret access key",
-          validate: (v) => (!v ? "Required" : undefined),
-        })
+      options.accessKeyId = await resolveText(options.accessKeyId, "R2 access key ID");
+      options.secretAccessKey = await resolveSecret(
+        options.secretAccessKey,
+        "R2 secret access key"
       );
       spinner.start("Checking supplied credentials");
     }
     spinner.message("Creating scoped upload credentials");
-    const keys = await credentials({ ...options, tokenClient, accountId, bucket });
+    const keys = await credentials({ ...options, tokenClient: cf, accountId, bucket });
     tokenId = keys.tokenId;
     const config: PigeonConfig = {
       accountId,
@@ -127,8 +141,8 @@ export const init = async (options: {
     spinner.stop("Setup failed");
     await removeSkill(home).catch(() => undefined);
     await rm(configPath(home), { force: true }).catch(() => undefined);
-    if (tokenId && tokenClient) await tokenClient.revokeToken(tokenId).catch(() => undefined);
-    if (bucketCreated) await r2.deleteBucket(accountId, bucket).catch(() => undefined);
+    if (tokenId) await cf.revokeToken(tokenId).catch(() => undefined);
+    if (bucketCreated) await cf.deleteBucket(accountId, bucket).catch(() => undefined);
     throw error;
   }
   p.outro("Ask your agent to share an artifact with Pigeon.");
@@ -148,13 +162,14 @@ export const doctor = async (): Promise<void> => {
   p.outro(`${config.publicBaseUrl} is reachable.`);
 };
 
-export const rotate = async (token?: string): Promise<void> => {
+export const rotate = async (options: { token?: string } = {}): Promise<void> => {
   const config = await readConfig();
-  const bootstrapToken =
-    token ?? process.env.CLOUDFLARE_TOKEN_TOKEN ?? process.env.CLOUDFLARE_API_TOKEN;
-  if (!bootstrapToken) throw new Error("Set CLOUDFLARE_TOKEN_TOKEN");
   if (!config.tokenId)
     throw new Error("Externally supplied credentials cannot be rotated by Pigeon");
+  const bootstrapToken = await resolveSecret(
+    options.token || process.env.CLOUDFLARE_API_TOKEN,
+    "Cloudflare API token (API Tokens Write)"
+  );
   const client = new CloudflareClient(bootstrapToken);
   const fresh = await client.createBucketToken(config.accountId, config.bucket);
   try {
@@ -172,11 +187,7 @@ export const rotate = async (token?: string): Promise<void> => {
   p.outro("Upload credentials rotated.");
 };
 
-export const destroy = async (options: {
-  r2Token?: string;
-  tokenToken?: string;
-  yes?: boolean;
-}): Promise<void> => {
+export const destroy = async (options: { token?: string; yes?: boolean }): Promise<void> => {
   const config = await readConfig();
   if (!options.yes) {
     const confirmed = requireValue(
@@ -187,20 +198,15 @@ export const destroy = async (options: {
     );
     if (!confirmed) throw new Error("Cancelled");
   }
-  const sharedToken = process.env.CLOUDFLARE_API_TOKEN;
-  const r2Token = options.r2Token ?? sharedToken;
-  if (!r2Token) throw new Error("Set CLOUDFLARE_API_TOKEN or pass --r2-token");
-  const tokenToken = config.tokenId
-    ? (options.tokenToken ?? process.env.CLOUDFLARE_TOKEN_TOKEN ?? sharedToken)
-    : undefined;
-  if (config.tokenId && !tokenToken) {
-    throw new Error("Set CLOUDFLARE_API_TOKEN or pass --token-token to revoke the managed key");
-  }
-  const r2 = new CloudflareClient(r2Token);
+  const token = await resolveSecret(
+    options.token || process.env.CLOUDFLARE_API_TOKEN,
+    "Cloudflare API token (R2 Edit + API Tokens Write)"
+  );
+  const cf = new CloudflareClient(token);
   await emptyBucket(config);
-  await r2.deleteBucket(config.accountId, config.bucket);
-  if (config.tokenId && tokenToken) {
-    await new CloudflareClient(tokenToken).revokeToken(config.tokenId);
+  await cf.deleteBucket(config.accountId, config.bucket);
+  if (config.tokenId) {
+    await cf.revokeToken(config.tokenId);
   }
   await removeSkill();
   await rm(configPath(), { force: true });

@@ -27,6 +27,18 @@ export class CloudflareClient {
     return body.result;
   }
 
+  async verifyAccess(accountId: string): Promise<void> {
+    await this.request(`/accounts/${accountId}/r2/buckets`);
+    const groups = await this.request<Array<{ id?: string; name?: string }>>(
+      `/user/tokens/permission_groups?name=${encodeURIComponent(bucketWritePermission)}`
+    );
+    if (!groups.some(({ name }) => name === bucketWritePermission)) {
+      throw new Error(
+        "Token lacks API Tokens Write scope; the write-only push key cannot be minted"
+      );
+    }
+  }
+
   async createBucket(accountId: string, bucket: string): Promise<void> {
     await this.request(`/accounts/${accountId}/r2/buckets`, {
       method: "POST",
