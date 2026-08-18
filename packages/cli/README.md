@@ -1,6 +1,6 @@
 # p1geon
 
-Bootstrap a Cloudflare R2 artifact route and install the Pigeon Agent Skill.
+Bootstrap a Cloudflare R2 artifact route and install the Pigeon agent skills.
 
 ```sh
 p1geon init --account YOUR_ACCOUNT_ID
