@@ -25,19 +25,22 @@ describe("skill ownership", () => {
 });
 
 describe("agent detection", () => {
-  test("installs into every detected agent and none when absent", async () => {
+  test("installs into every detected agent and only the source when absent", async () => {
     const home = await mkdtemp(join(tmpdir(), "pigeon-skill-"));
     expect(await detectAgents(home)).toHaveLength(0);
-    expect(await installSkill(home)).toHaveLength(0);
+    // With no agents present, only the ~/.agents source is installed.
+    expect(await installSkill(home)).toEqual([skillPath(home)]);
 
     await mkdir(join(home, ".claude"), { recursive: true });
     await mkdir(join(home, ".config", "opencode"), { recursive: true });
     await removeSkill(home);
 
     const links = await installSkill(home);
-    expect(links).toHaveLength(2);
+    expect(links).toContain(skillPath(home));
     const claudeLink = join(home, ".claude", "skills", "pigeon");
     const opencodeLink = join(home, ".config", "opencode", "skills", "pigeon");
+    expect(links).toContain(claudeLink);
+    expect(links).toContain(opencodeLink);
     expect((await lstat(claudeLink)).isSymbolicLink()).toBe(true);
     expect((await lstat(opencodeLink)).isSymbolicLink()).toBe(true);
     expect(await readFile(join(claudeLink, "SKILL.md"), "utf8")).toContain("name: pigeon");
@@ -54,7 +57,7 @@ describe("agent detection", () => {
     await writeFile(join(claudeSkill, "SKILL.md"), "user content");
 
     const links = await installSkill(home);
-    expect(links).toHaveLength(0);
+    expect(links).not.toContain(claudeSkill);
     expect(await readlink(claudeSkill).catch(() => null)).toBeNull();
     expect(await readFile(join(claudeSkill, "SKILL.md"), "utf8")).toBe("user content");
 

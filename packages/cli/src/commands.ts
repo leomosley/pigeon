@@ -138,12 +138,7 @@ export const init = async (options: {
       `${publicBaseUrl}\nArtifacts expire after ${options.retentionDays} days.`,
       "Public route"
     );
-    p.note(
-      links.length
-        ? `Installed for ${links.length} agent(s):\n${links.join("\n")}`
-        : "No agents detected; the skill lives at ~/.agents/skills/pigeon.",
-      "Agent skill"
-    );
+    p.note(`Installed the skill at:\n${links.join("\n")}`, "Agent skill");
   } catch (error) {
     spinner.stop("Setup failed");
     await removeSkill(home).catch(() => undefined);

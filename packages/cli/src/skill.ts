@@ -168,7 +168,9 @@ export const installSkill = async (home = homedir()): Promise<string[]> => {
   await writeFile(join(source, "SKILL.md"), skill, "utf8");
   await writeFile(join(source, marker), "", "utf8");
 
-  const links: string[] = [];
+  // The `~/.agents/skills` copy is always installed as the source of truth,
+  // regardless of which agents are detected.
+  const links: string[] = [source];
   for (const agent of await detectAgents(home)) {
     const link = await linkAgent(agent.skillDir(home), source);
     if (link) links.push(link);
