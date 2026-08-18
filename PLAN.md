@@ -48,8 +48,9 @@ Two separate auth concerns, deliberately kept apart:
 - **R2 Admin** — create bucket, set lifecycle, enable public domain.
 - **API Tokens Write** — mint the scoped push key.
 
-Low-privilege alternative: `pigeon init --with-key <r2-write-key>` skips minting
-and takes a pre-made R2 write key, avoiding the API-Tokens-Write permission.
+Low-privilege alternative: `pigeon init --with-key` skips minting and instead
+takes a pre-made R2 write key (`--access-key-id` / `--secret-access-key`),
+avoiding the API-Tokens-Write permission.
 
 ## CLI command surface
 
@@ -57,7 +58,8 @@ and takes a pre-made R2 write key, avoiding the API-Tokens-Write permission.
 pigeon init      create bucket + enable r2.dev + mint bucket-scoped write-only key
                  + 90-day lifecycle rule + write config + self-test upload
                  + install skill + symlink into detected agent dirs
-                 flags: --account --bucket --retention-days(=90) --with-key
+                 flags: --account --bucket --retention-days(=90) --token
+                        --with-key --access-key-id --secret-access-key --dry-run
 pigeon env       print `export AWS_ACCESS_KEY_ID=… …` lines for the skill to source
 pigeon rotate    mint a fresh key, revoke the old one
 pigeon destroy   revoke key + delete bucket + remove skill/symlinks + config

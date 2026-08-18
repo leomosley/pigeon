@@ -23,14 +23,24 @@ const wait = (milliseconds: number): Promise<void> =>
 export const verifyR2 = async (config: PigeonConfig): Promise<void> => {
   const client = r2Client(config);
   const key = `.pigeon/doctor-${crypto.randomUUID()}.txt`;
-  await client.send(
-    new PutObjectCommand({
-      Bucket: config.bucket,
-      Key: key,
-      Body: "pigeon can fly",
-      ContentType: "text/plain; charset=utf-8",
-    })
-  );
+  const put = new PutObjectCommand({
+    Bucket: config.bucket,
+    Key: key,
+    Body: "pigeon can fly",
+    ContentType: "text/plain; charset=utf-8",
+  });
+  // A freshly minted R2 token is briefly rejected while it propagates to the
+  // S3 endpoint, so retry the first write past that eventual-consistency window.
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await client.send(put);
+      break;
+    } catch (error) {
+      const name = (error as { name?: string }).name;
+      if (attempt >= 9 || (name !== "Unauthorized" && name !== "AccessDenied")) throw error;
+      await wait(1_000);
+    }
+  }
   try {
     const url = `${config.publicBaseUrl}/${key}`;
     let response: Response | undefined;

@@ -10,6 +10,7 @@
   },
   "homepage": "https://pigeon.mosley.dev",
   "bin": {
+    "p1geon": "dist/index.js",
     "pigeon": "dist/index.js"
   },
   "files": [
