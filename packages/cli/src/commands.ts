@@ -130,12 +130,19 @@ export const init = async (options: {
     };
     spinner.message("Checking upload access");
     await verifyR2(config);
-    await installSkill(home);
+    spinner.message("Installing the Pigeon skill");
+    const links = await installSkill(home);
     await writeConfig(config, home);
     spinner.stop("Pigeon is ready");
     p.note(
       `${publicBaseUrl}\nArtifacts expire after ${options.retentionDays} days.`,
       "Public route"
+    );
+    p.note(
+      links.length
+        ? `Installed for ${links.length} agent(s):\n${links.join("\n")}`
+        : "No agents detected; the skill lives at ~/.agents/skills/pigeon.",
+      "Agent skill"
     );
   } catch (error) {
     spinner.stop("Setup failed");

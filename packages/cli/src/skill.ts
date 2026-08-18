@@ -64,64 +64,89 @@ After upload, return the public URL and local file path.
 
 export const skillPath = (home = homedir()): string => join(home, ".agents", "skills", "pigeon");
 
-const claudePath = (home: string): string => join(home, ".claude", "skills", "pigeon");
 const marker = ".pigeon-managed";
 
-export const installSkill = async (home = homedir()): Promise<string[]> => {
-  const source = skillPath(home);
+interface Agent {
+  /** Human-readable name, surfaced to the user. */
+  name: string;
+  /** Directory whose presence signals the agent is installed. */
+  configDir: (home: string) => string;
+  /** Where this agent expects the skill to live. */
+  skillDir: (home: string) => string;
+}
+
+/**
+ * Known agents and the conventions they use. An agent is considered installed
+ * when its `configDir` exists on disk.
+ */
+const agents: Agent[] = [
+  {
+    name: "Claude Code",
+    configDir: (home) => join(home, ".claude"),
+    skillDir: (home) => join(home, ".claude", "skills", "pigeon"),
+  },
+  {
+    name: "opencode",
+    configDir: (home) => join(home, ".config", "opencode"),
+    skillDir: (home) => join(home, ".config", "opencode", "skills", "pigeon"),
+  },
+];
+
+const exists = async (path: string): Promise<boolean> => {
   try {
-    await access(source);
-    await access(join(source, marker));
+    await access(path);
+    return true;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    try {
-      await access(source);
-      throw new Error(`Refusing to replace unmanaged skill at ${source}`);
-    } catch (sourceError) {
-      if ((sourceError as NodeJS.ErrnoException).code !== "ENOENT") throw sourceError;
-    }
+    return false;
   }
-  await mkdir(source, { recursive: true });
-  await writeFile(join(source, "SKILL.md"), skill, "utf8");
-  await writeFile(join(source, marker), "", "utf8");
+};
 
-  const links: string[] = [];
-  const destination = claudePath(home);
+/** Agents whose config directory is present on the machine. */
+export const detectAgents = async (home = homedir()): Promise<Agent[]> => {
+  const detected: Agent[] = [];
+  for (const agent of agents) {
+    if (await exists(agent.configDir(home))) detected.push(agent);
+  }
+  return detected;
+};
+
+const linkAgent = async (destination: string, source: string): Promise<string | undefined> => {
   await mkdir(dirname(destination), { recursive: true });
   try {
     const stat = await lstat(destination);
     if (
-      !stat.isSymbolicLink() ||
-      (await readlink(destination)) !== relative(dirname(destination), source)
+      stat.isSymbolicLink() &&
+      (await readlink(destination)) === relative(dirname(destination), source)
     ) {
-      return links;
+      return destination;
     }
+    // Something else already lives here; leave it untouched.
+    return undefined;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    try {
-      await symlink(relative(dirname(destination), source), destination, "dir");
-    } catch (linkError) {
-      if (["EPERM", "EACCES"].includes((linkError as NodeJS.ErrnoException).code ?? "")) {
-        await mkdir(destination, { recursive: true });
-        await writeFile(join(destination, "SKILL.md"), skill, "utf8");
-        await writeFile(join(destination, marker), "", "utf8");
-        links.push(destination);
-        return links;
-      }
-      throw linkError;
-    }
   }
-  links.push(destination);
-  return links;
+  try {
+    await symlink(relative(dirname(destination), source), destination, "dir");
+  } catch (linkError) {
+    if (["EPERM", "EACCES"].includes((linkError as NodeJS.ErrnoException).code ?? "")) {
+      await mkdir(destination, { recursive: true });
+      await writeFile(join(destination, "SKILL.md"), skill, "utf8");
+      await writeFile(join(destination, marker), "", "utf8");
+      return destination;
+    }
+    throw linkError;
+  }
+  return destination;
 };
 
-export const removeSkill = async (home = homedir()): Promise<void> => {
-  const destination = claudePath(home);
+const unlinkAgent = async (destination: string, source: string): Promise<void> => {
   try {
     const destinationStat = await lstat(destination);
     if (destinationStat.isSymbolicLink()) {
-      const target = await readlink(destination);
-      if (target === relative(dirname(destination), skillPath(home))) await rm(destination);
+      if ((await readlink(destination)) === relative(dirname(destination), source)) {
+        await rm(destination);
+      }
     } else {
       await access(join(destination, marker));
       await rm(destination, { recursive: true });
@@ -129,9 +154,36 @@ export const removeSkill = async (home = homedir()): Promise<void> => {
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
+};
+
+export const installSkill = async (home = homedir()): Promise<string[]> => {
+  const source = skillPath(home);
   try {
-    await access(join(skillPath(home), marker));
-    await rm(skillPath(home), { recursive: true, force: true });
+    await access(join(source, marker));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    if (await exists(source)) throw new Error(`Refusing to replace unmanaged skill at ${source}`);
+  }
+  await mkdir(source, { recursive: true });
+  await writeFile(join(source, "SKILL.md"), skill, "utf8");
+  await writeFile(join(source, marker), "", "utf8");
+
+  const links: string[] = [];
+  for (const agent of await detectAgents(home)) {
+    const link = await linkAgent(agent.skillDir(home), source);
+    if (link) links.push(link);
+  }
+  return links;
+};
+
+export const removeSkill = async (home = homedir()): Promise<void> => {
+  const source = skillPath(home);
+  for (const agent of agents) {
+    await unlinkAgent(agent.skillDir(home), source);
+  }
+  try {
+    await access(join(source, marker));
+    await rm(source, { recursive: true, force: true });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
