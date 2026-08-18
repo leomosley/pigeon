@@ -10,18 +10,52 @@ an Agent Skill. It is a bootstrapper, not a background service.
 ## Install
 
 ```sh
-npm exec --yes --package=p1geon@latest -- pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
+p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
 ```
 
-Set `CLOUDFLARE_API_TOKEN` to a bootstrap token with Workers R2 Storage Write.
-For automatic upload-key creation, set `CLOUDFLARE_TOKEN_TOKEN` to a second token
-made from Cloudflare's Create additional tokens template. Bootstrap tokens are
-never stored.
+### Create your Cloudflare token (step by step)
 
-To avoid API Tokens Write, create bucket-scoped R2 S3 credentials first:
+Pigeon needs **one** Cloudflare API token carrying **two** permissions. Follow
+these exactly:
+
+1. Go to <https://dash.cloudflare.com/profile/api-tokens>.
+2. Click **Create Token**.
+3. Scroll to the bottom and, next to **Create Custom Token**, click **Get started**
+   (do not use a template).
+4. In **Token name**, type `p1geon`.
+5. Under **Permissions**, set the first row of dropdowns to:
+   **Account** → **Workers R2 Storage** → **Edit**.
+6. Click **+ Add more** and set the second row to:
+   **User** → **API Tokens** → **Write**.
+
+   You should end up with exactly:
+
+   | Group   | Item               | Access |
+   | ------- | ------------------ | ------ |
+   | Account | Workers R2 Storage | Edit   |
+   | User    | API Tokens         | Write  |
+
+7. Under **Account Resources**, leave **Include** and pick **your account**
+   (not "All accounts").
+8. Leave **Client IP Address Filtering** and **TTL** blank.
+9. Click **Continue to summary**, then **Create Token**.
+10. **Copy the token now** — Cloudflare shows it only once.
+
+**Find your Account ID:** in the dashboard, open **R2 Object Storage** → the
+**Account ID** is in the right sidebar (it's also in the URL after
+`dash.cloudflare.com/`).
+
+**Use them:** run the command above and paste the token when prompted, or set
+`CLOUDFLARE_API_TOKEN` in your environment first. The token is never stored.
+
+Add `--dry-run` to validate the token and account and print the plan without
+creating anything.
+
+To avoid granting API Tokens Write, create bucket-scoped R2 S3 credentials first
+and hand them to Pigeon (only Workers R2 Storage · Edit is then required):
 
 ```sh
-npm exec --yes --package=p1geon@latest -- pigeon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
+p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
 ```
 
 Agents need `aws-cli` to upload artifacts. See [pigeon.mosley.dev](https://pigeon.mosley.dev)
@@ -30,11 +64,11 @@ for full setup guidance.
 ## Commands
 
 ```text
-pigeon init      Create route and install skill
-pigeon env       Print shell-scoped upload environment
-pigeon doctor    Test upload, public read, and cleanup
-pigeon rotate    Replace Pigeon-managed upload credentials
-pigeon destroy   Remove bucket, key, skill, and config
+p1geon init      Create route and install skill
+p1geon env       Print shell-scoped upload environment
+p1geon doctor    Test upload, public read, and cleanup
+p1geon rotate    Replace Pigeon-managed upload credentials
+p1geon destroy   Remove bucket, key, skill, and config
 ```
 
 Config lives at `~/.pigeon/config` with mode `0600`. Shared skill source lives at

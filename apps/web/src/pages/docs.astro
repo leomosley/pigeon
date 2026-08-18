@@ -17,24 +17,68 @@ import Base from "../layouts/Base.astro";
 
     <div class="mt-14 space-y-14">
       <section>
-        <h2 class="text-base font-medium text-neutral-200">1. Create Cloudflare tokens</h2>
+        <h2 class="text-base font-medium text-neutral-200">1. Create a Cloudflare token</h2>
         <p class="mt-3 max-w-2xl text-sm leading-7 text-neutral-500">
-          Set <code class="text-neutral-300">CLOUDFLARE_API_TOKEN</code> to a token with Workers R2 Storage
-          Write. Set <code class="text-neutral-300">CLOUDFLARE_TOKEN_TOKEN</code> to a token made from
-          Cloudflare's Create additional tokens template. Bootstrap tokens are never stored.
+          Pigeon needs one Cloudflare API token that carries two permissions: <strong
+            class="text-neutral-300">Workers R2 Storage · Edit</strong
+          > (creates the bucket, public route, and lifecycle rule) and <strong
+            class="text-neutral-300">API Tokens · Write</strong
+          > (mints the bucket-scoped upload key). The token is never stored.
+        </p>
+        <ol class="mt-4 max-w-2xl space-y-2 text-sm leading-7 text-neutral-500">
+          <li>
+            1. Open <a
+              href="https://dash.cloudflare.com/profile/api-tokens"
+              class="text-neutral-300 underline underline-offset-2 hover:text-white"
+              >dash.cloudflare.com/profile/api-tokens</a
+            >.
+          </li>
+          <li>2. Click <strong class="text-neutral-300">Create Token</strong>.</li>
+          <li>
+            3. At the bottom, next to <strong class="text-neutral-300">Create Custom Token</strong>,
+            click <strong class="text-neutral-300">Get started</strong>.
+          </li>
+          <li>4. Name it <code class="text-neutral-300">p1geon</code>.</li>
+          <li>
+            5. Under <strong class="text-neutral-300">Permissions</strong>, set the first row to <code
+              class="text-neutral-300">Account → Workers R2 Storage → Edit</code
+            >.
+          </li>
+          <li>
+            6. Click <strong class="text-neutral-300">+ Add more</strong> and set the second row to <code
+              class="text-neutral-300">User → API Tokens → Write</code
+            >.
+          </li>
+          <li>
+            7. Under <strong class="text-neutral-300">Account Resources</strong>, choose <code
+              class="text-neutral-300">Include</code
+            > → your account.
+          </li>
+          <li>
+            8. Click <strong class="text-neutral-300">Continue to summary</strong>, then <strong
+              class="text-neutral-300">Create Token</strong
+            >, and copy the token — it is shown only once.
+          </li>
+        </ol>
+        <p class="mt-4 max-w-2xl text-sm leading-7 text-neutral-500">
+          Find your <strong class="text-neutral-300">Account ID</strong> on the R2 Overview page (right
+          sidebar), or in the dashboard URL after <code class="text-neutral-300"
+            >dash.cloudflare.com/</code
+          >.
         </p>
       </section>
 
       <section>
         <h2 class="text-base font-medium text-neutral-200">2. Run setup</h2>
         <div class="mt-4">
-          <CopyCommand
-            command="npm exec --yes --package=p1geon@latest -- pigeon init --account YOUR_ACCOUNT_ID"
-          />
+          <CopyCommand command="p1geon init --account YOUR_ACCOUNT_ID" />
         </div>
         <p class="mt-3 text-sm leading-7 text-neutral-500">
-          To supply pre-made bucket credentials instead, add <code class="text-neutral-300"
-            >--with-key</code
+          Paste the token when prompted (or set <code class="text-neutral-300"
+            >CLOUDFLARE_API_TOKEN</code
+          >). Add <code class="text-neutral-300">--dry-run</code> to validate the token and account without
+          creating anything. To supply pre-made bucket credentials instead, add <code
+            class="text-neutral-300">--with-key</code
           >.
         </p>
       </section>
@@ -42,7 +86,7 @@ import Base from "../layouts/Base.astro";
       <section>
         <h2 class="text-base font-medium text-neutral-200">3. Check it works</h2>
         <div class="mt-4">
-          <CopyCommand command="npm exec --yes --package=p1geon@latest -- pigeon doctor" />
+          <CopyCommand command="p1geon doctor" />
         </div>
         <p class="mt-3 text-sm leading-7 text-neutral-500">
           Doctor uploads a small file, opens it through the public route, then deletes it.
@@ -62,9 +106,9 @@ import Base from "../layouts/Base.astro";
       <section>
         <h2 class="text-base font-medium text-neutral-200">Manage it</h2>
         <div class="mt-4 space-y-2 font-mono text-sm text-neutral-400">
-          <p>pigeon env --shell sh</p>
-          <p>pigeon rotate</p>
-          <p>pigeon destroy</p>
+          <p>p1geon env --shell sh</p>
+          <p>p1geon rotate</p>
+          <p>p1geon destroy</p>
         </div>
       </section>
     </div>
