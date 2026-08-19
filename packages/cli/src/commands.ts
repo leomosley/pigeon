@@ -154,6 +154,16 @@ export const env = async (shell: "sh" | "powershell"): Promise<void> => {
   process.stdout.write(`${renderEnvironment(await readConfig(), shell)}\n`);
 };
 
+export const skills = async (): Promise<void> => {
+  p.intro("pigeon skills");
+  const spinner = p.spinner();
+  spinner.start("Reinstalling the Pigeon skills");
+  const links = await installSkill(homedir(), true);
+  spinner.stop("Skills reinstalled");
+  p.note(`Installed the skills at:\n${links.join("\n")}`, "Agent skills");
+  p.outro("Pigeon skills are up to date.");
+};
+
 export const doctor = async (): Promise<void> => {
   p.intro("pigeon doctor");
   const config = await readConfig();
