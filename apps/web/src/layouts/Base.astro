@@ -41,7 +41,7 @@ const repo = "https://github.com/leomosley/pigeon";
       rel="stylesheet"
     />
   </head>
-  <body class="min-h-screen text-neutral-300 antialiased">
+  <body class="flex min-h-screen flex-col text-neutral-300 antialiased">
     <header class="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 py-4 sm:px-8">
       <a
         href="/"
@@ -63,7 +63,7 @@ const repo = "https://github.com/leomosley/pigeon";
         >
       </nav>
     </header>
-    <main class="relative z-10"><slot /></main>
+    <main class="relative z-10 flex-1"><slot /></main>
     <footer
       class="relative z-10 border-t border-white/[0.06] px-5 py-8 text-xs text-neutral-600 sm:px-8"
     >
