@@ -7,8 +7,11 @@ Guidance for AI agents working in this repo.
 Pigeon is a Cloudflare R2 artifact-sharing bootstrapper. The `packages/cli`
 package creates an R2 bucket, enables its public `r2.dev` route, sets a
 retention lifecycle, mints a bucket-scoped write-only upload key, and installs the
-Pigeon Agent Skill. The skill is written to `~/.agents/skills/pigeon` and linked
-into every agent detected on the machine (currently Claude Code and opencode).
+Pigeon agent skills. Two skills ship together: `pigeon` (upload an artifact via a
+direct SigV4 PUT and return its public URL) and `take-screenshot` (capture a
+screen/window/page, learning the working method per platform, then share it via
+`pigeon`). They are written to `~/.agents/skills/<name>` and linked into every
+agent detected on the machine (currently Claude Code and opencode).
 `apps/web` is the Astro landing page.
 
 ## Checks (run from repo root)

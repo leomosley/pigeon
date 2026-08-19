@@ -130,7 +130,7 @@ export const init = async (options: {
     };
     spinner.message("Checking upload access");
     await verifyR2(config);
-    spinner.message("Installing the Pigeon skill");
+    spinner.message("Installing the Pigeon skills");
     const links = await installSkill(home);
     await writeConfig(config, home);
     spinner.stop("Pigeon is ready");
@@ -138,7 +138,7 @@ export const init = async (options: {
       `${publicBaseUrl}\nArtifacts expire after ${options.retentionDays} days.`,
       "Public route"
     );
-    p.note(`Installed the skill at:\n${links.join("\n")}`, "Agent skill");
+    p.note(`Installed the skills at:\n${links.join("\n")}`, "Agent skills");
   } catch (error) {
     spinner.stop("Setup failed");
     await removeSkill(home).catch(() => undefined);
