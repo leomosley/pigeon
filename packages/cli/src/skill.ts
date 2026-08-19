@@ -154,7 +154,8 @@ export const detectAgents = async (home = homedir()): Promise<Agent[]> => {
 const linkAgent = async (
   destination: string,
   source: string,
-  content: string
+  content: string,
+  force = false
 ): Promise<string | undefined> => {
   await mkdir(dirname(destination), { recursive: true });
   try {
@@ -165,8 +166,9 @@ const linkAgent = async (
     ) {
       return destination;
     }
-    // Something else already lives here; leave it untouched.
-    return undefined;
+    // Something else already lives here.
+    if (!force) return undefined; // Leave it untouched.
+    await rm(destination, { recursive: true, force: true });
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
   }
@@ -200,13 +202,14 @@ const unlinkAgent = async (destination: string, source: string): Promise<void> =
   }
 };
 
-const installOne = async (skill: Skill, home: string): Promise<string[]> => {
+const installOne = async (skill: Skill, home: string, force = false): Promise<string[]> => {
   const source = skillPath(skill.name, home);
   try {
     await access(join(source, marker));
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    if (await exists(source)) throw new Error(`Refusing to replace unmanaged skill at ${source}`);
+    if (!force && (await exists(source)))
+      throw new Error(`Refusing to replace unmanaged skill at ${source}`);
   }
   await mkdir(source, { recursive: true });
   await writeFile(join(source, "SKILL.md"), skill.content, "utf8");
@@ -216,16 +219,21 @@ const installOne = async (skill: Skill, home: string): Promise<string[]> => {
   // regardless of which agents are detected.
   const links: string[] = [source];
   for (const agent of await detectAgents(home)) {
-    const link = await linkAgent(join(agent.skillsDir(home), skill.name), source, skill.content);
+    const link = await linkAgent(
+      join(agent.skillsDir(home), skill.name),
+      source,
+      skill.content,
+      force
+    );
     if (link) links.push(link);
   }
   return links;
 };
 
-export const installSkill = async (home = homedir()): Promise<string[]> => {
+export const installSkill = async (home = homedir(), force = false): Promise<string[]> => {
   const links: string[] = [];
   for (const skill of skills) {
-    links.push(...(await installOne(skill, home)));
+    links.push(...(await installOne(skill, home, force)));
   }
   return links;
 };

@@ -67,6 +67,7 @@ for full setup guidance.
 p1geon init      Create route and install skill
 p1geon env       Print shell-scoped upload environment
 p1geon doctor    Test upload, public read, and cleanup
+p1geon skills    Reinstall the agent skills, overwriting what is on disk
 p1geon rotate    Replace Pigeon-managed upload credentials
 p1geon destroy   Remove bucket, key, skill, and config
 ```

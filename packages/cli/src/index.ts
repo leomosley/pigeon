@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command, Option } from "commander";
 import packageJson from "../package.json" with { type: "json" };
-import { destroy, doctor, env, init, rotate } from "./commands";
+import { destroy, doctor, env, init, rotate, skills } from "./commands";
 
 const program = new Command()
   .name("pigeon")
@@ -34,6 +34,10 @@ program
   .action(({ shell }: { shell: "sh" | "powershell" }) => env(shell));
 
 program.command("doctor").description("Test upload, read, and cleanup access").action(doctor);
+program
+  .command("skills")
+  .description("Reinstall the Pigeon agent skills, overwriting what is on disk")
+  .action(skills);
 program
   .command("rotate")
   .description("Replace Pigeon-managed upload credentials")

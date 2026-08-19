@@ -25,6 +25,16 @@ describe("skill ownership", () => {
     await removeSkill(home);
     expect(await readFile(path, "utf8")).toBe("user content");
   });
+
+  test("force overwrites an unmanaged skill when re-pulling", async () => {
+    const home = await mkdtemp(join(tmpdir(), "pigeon-skill-"));
+    await mkdir(skillPath("pigeon", home), { recursive: true });
+    const path = join(skillPath("pigeon", home), "SKILL.md");
+    await writeFile(path, "user content");
+    await installSkill(home, true);
+    expect(await readFile(path, "utf8")).toContain("name: pigeon");
+    expect(await readFile(join(skillPath("pigeon", home), ".pigeon-managed"), "utf8")).toBe("");
+  });
 });
 
 describe("agent detection", () => {
