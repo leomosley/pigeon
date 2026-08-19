@@ -35,6 +35,19 @@ describe("skill ownership", () => {
     expect(await readFile(path, "utf8")).toContain("name: pigeon");
     expect(await readFile(join(skillPath("pigeon", home), ".pigeon-managed"), "utf8")).toBe("");
   });
+
+  test("keeps installing sources when an agent skills dir is unusable", async () => {
+    const home = await mkdtemp(join(tmpdir(), "pigeon-skill-"));
+    // A file where the agent config dir is expected: detected, but linking fails.
+    await writeFile(join(home, ".claude"), "not a directory");
+
+    const links = await installSkill(home);
+    expect(links).toContain(skillPath("pigeon", home));
+    expect(links).toContain(skillPath("take-screenshot", home));
+    expect(await readFile(join(skillPath("pigeon", home), "SKILL.md"), "utf8")).toContain(
+      "name: pigeon"
+    );
+  });
 });
 
 describe("agent detection", () => {
