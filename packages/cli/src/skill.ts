@@ -219,13 +219,20 @@ const installOne = async (skill: Skill, home: string, force = false): Promise<st
   // regardless of which agents are detected.
   const links: string[] = [source];
   for (const agent of await detectAgents(home)) {
-    const link = await linkAgent(
-      join(agent.skillsDir(home), skill.name),
-      source,
-      skill.content,
-      force
-    );
-    if (link) links.push(link);
+    // Linking into an agent is best-effort: a broken or unwritable skills
+    // directory for one agent must not abort installing the rest.
+    try {
+      const link = await linkAgent(
+        join(agent.skillsDir(home), skill.name),
+        source,
+        skill.content,
+        force
+      );
+      if (link) links.push(link);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      process.stderr.write(`pigeon: skipped ${agent.name} skill (${reason})\n`);
+    }
   }
   return links;
 };
