@@ -20,11 +20,14 @@ Never expose credentials or print the raw output of \`pigeon env\`.
 1. Load the route into the environment. Do this and the upload in a single shell
    invocation so the secrets never linger:
 
-   - sh: \`eval "$(pigeon env --shell sh)"\`
-   - PowerShell: \`Invoke-Expression (& pigeon env --shell powershell | Out-String)\`
+   - sh: \`eval "$(npx -y p1geon env --shell sh)"\`
+   - PowerShell: \`Invoke-Expression (& npx -y p1geon env --shell powershell | Out-String)\`
 
-   This sets \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`, \`AWS_REGION\` (\`auto\`),
-   \`PIGEON_BUCKET\`, \`PIGEON_ENDPOINT\`, and \`PIGEON_PUBLIC_BASE_URL\`.
+   This runs Pigeon via \`npx\`, so it works whether or not \`pigeon\` is on \`PATH\`.
+   If \`pigeon\` (or \`p1geon\`) is already installed globally you may call it
+   directly instead. It sets \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`,
+   \`AWS_REGION\` (\`auto\`), \`PIGEON_BUCKET\`, \`PIGEON_ENDPOINT\`, and
+   \`PIGEON_PUBLIC_BASE_URL\`.
 
 2. Choose a random UUID object key that keeps the file's original extension.
 
