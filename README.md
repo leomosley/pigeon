@@ -10,7 +10,7 @@ an Agent Skill. It is a bootstrapper, not a background service.
 ## Install
 
 ```sh
-p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
+npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID
 ```
 
 ### Create your Cloudflare token (step by step)
@@ -55,7 +55,7 @@ To avoid granting API Tokens Write, create bucket-scoped R2 S3 credentials first
 and hand them to Pigeon (only Workers R2 Storage · Edit is then required):
 
 ```sh
-p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
+npx p1geon init --account YOUR_CLOUDFLARE_ACCOUNT_ID --with-key
 ```
 
 Agents need `aws-cli` to upload artifacts. See [pigeon.mosley.dev](https://pigeon.mosley.dev)
@@ -64,12 +64,12 @@ for full setup guidance.
 ## Commands
 
 ```text
-p1geon init      Create route and install skill
-p1geon env       Print shell-scoped upload environment
-p1geon doctor    Test upload, public read, and cleanup
-p1geon skills    Reinstall the agent skills, overwriting what is on disk
-p1geon rotate    Replace Pigeon-managed upload credentials
-p1geon destroy   Remove bucket, key, skill, and config
+npx p1geon init      Create route and install skill
+npx p1geon env       Print shell-scoped upload environment
+npx p1geon doctor    Test upload, public read, and cleanup
+npx p1geon skills    Reinstall the agent skills, overwriting what is on disk
+npx p1geon rotate    Replace Pigeon-managed upload credentials
+npx p1geon destroy   Remove bucket, key, skill, and config
 ```
 
 Config lives at `~/.pigeon/config` with mode `0600`. Shared skill source lives at
